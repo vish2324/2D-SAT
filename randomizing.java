@@ -21,7 +21,7 @@ class randomizing {
     }
 
     /**
-     * Generates a random false
+     * Get all unsatisfied clauses in random order
      */
     private static Clause genRandFalse( ArrayList<Clause> clauses, ArrayList<Clause> clausesFalse, ArrayList<Boolean> randContents) {
         Clause randomClause = null;
@@ -45,46 +45,47 @@ class randomizing {
         ArrayList<Boolean> randContents = new ArrayList<>();
 
         for ( int i = 0; i < clauses.size(); i++ ) {
-            randContents.add(true);
+            randContents.add(true); //arbitrary initialization of all variable values as true
         }
 
         int n = clauses.size();
         int count = 1;
         boolean done = false;
 
-        while ( count <= Math.log( n ) / Math.log( 2 ) ) { //2^count <= clause.size
+        while ( count <= Math.log( n ) / Math.log( 2 ) ) { //run as long as count less than log2(clause size)
             int count2 = 1;
 
-            Collections.shuffle( randContents ); //shuffling contents of array
+            Collections.shuffle( randContents ); //shuffling contents of array so as to pick arbitrary variable
 
-            while ( count2 <= (double) 2*n*n ) { //count2 <= 2(clause.size^2)
+            while ( count2 <= (double) 2*n*n ) { //run 2n^2 time
+                //both while loop conditions help decrease error probability
 
-                Clause c = genRandFalse(clauses, clausesFalse, randContents);
+                Clause c = genRandFalse(clauses, clausesFalse, randContents); //get all unsatisfied clauses
 
-                if ( c == null ) {
-                    done = true;
+                if ( c == null ) { //if no unsatisfied clauses
+                    done = true; //looping done
                     break;
                 }
                 else {
-                    int r = new Random().nextInt( 2 ) + 1;
-
+                    int r = new Random().nextInt( 2 ) + 1; //choosing which vairable to choose form unsatisfied clause
+                    
                     if ( r == 1 ) {
                         Boolean b = randContents.get( Math.abs( c.getA() ) );
-                        randContents.set( Math.abs( c.getA() ), !b );
+                        randContents.set( Math.abs( c.getA() ), !b ); //invert boolean value and put back
                     }
                     else {
                         Boolean b = randContents.get( Math.abs( c.getB() ) );
-                        randContents.set( Math.abs( c.getB() ), !b );
+                        randContents.set( Math.abs( c.getB() ), !b ); //invert boolean value and put back
                     }
                 }
                 count2++;
             }
-            if ( done ) {
+            if ( done ) { //if done then exit loop
                 break;
             }
             count++;
         }
-        if(done){
+        if(done){ //check if solution found or not nad is satifsiable or not
             System.out.println("\nRandomizer algo output: Satisfiable\n");
         }
         else
